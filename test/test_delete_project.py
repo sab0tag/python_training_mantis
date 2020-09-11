@@ -2,7 +2,7 @@ import random
 from model.project import Project
 
 
-def test_delete_project(app, check_ui):
+def test_delete_project(app):
     app.session.login("administrator", "root")
     if len(app.project.get_projects_lst()) == 0:
         app.project.create_project(Project(name="name-" + str(random.randrange(100)),
@@ -13,7 +13,9 @@ def test_delete_project(app, check_ui):
     project = random.choice(old_projects_lst)
     app.project.delete_project(project)
     new_projects_list = app.project.get_projects_lst()
-    assert len(old_projects_lst) - 1 == len(new_projects_list)
+    assert old_projects_lst - 1 == new_projects_list
+    old_projects_lst.remove(project)
+    """
     old_projects_lst.remove(project)
     assert sorted(old_projects_lst, key=Project.id_or_max) == sorted(new_projects_list, key=Project.id_or_max)
-
+    """

@@ -2,6 +2,7 @@ import pytest
 import json
 import os.path
 from fixture.application import Application
+import ftputil
 
 fixture = None
 target = None
@@ -31,13 +32,16 @@ def app(request):
 def stop(request):
     def fin():
         fixture.destroy()
+
     # destroy fixture
     request.addfinalizer(fin)
     return fixture
 
+
 @pytest.fixture
 def check_ui(request):
     return request.config.getoption("--check_ui")
+
 
 # add additional parameters inside of function; called once at the beginning ot the test run
 def pytest_addoption(parser):
@@ -45,3 +49,37 @@ def pytest_addoption(parser):
     parser.addoption("--target", action="store", default="target.json")
     parser.addoption("--check_ui", action="store_true")  # where action will be automatically true if flag is present;
 
+
+@pytest.fixture(scope="session")
+def config(request):
+    return loadconfig(request.config.getoption("--target"))
+
+
+@pytest.fixture(scope="session", autouse=True)
+def configure_server(request, config):
+    install_server_configuration(config['ftp']['host'],
+                                 config['ftp']['username'],
+                                 config['ftp']['password'])
+
+    def fin():
+        restore_server_configuration(config['ftp']['host'],
+                                     config['ftp']['username'],
+                                     config['ftp']['password'])
+
+    request.addfinalizer(fin)
+
+
+def install_server_configuration(host, username, password):
+    with ftputil.FTPHost(host, username, password) as remote:
+        if remote.path.isfile("config_inc.php.bak"):
+            remote.remove("config_inc.php.bak")
+        if remote.path.isfile("config_inc.php"):
+            remote.rename("config_inc.php", "config_inc.php.bak")
+        remote.upload(os.path.join(os.path.dirname(__file__), "resources/config_inc.php", "config_inc.php"))
+
+
+def restore_server_configuration(host, username, password):
+    with ftputil.FTPHost(host, username, password) as remote:
+        if remote.path.isfile("config_inc.php.bak"):
+            remote.remove("config_inc_php")
+        remote.rename("config_inc.php.bak", "config_inc.php")
