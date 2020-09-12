@@ -9,12 +9,12 @@ def test_delete_project(app):
                                            status=random.choice(["development", "release"]),
                                            viewstatus=random.choice(["private", "public"]),
                                            description="description-" + str(random.randrange(100))))
-    old_projects_lst = app.project.get_projects_lst()
-    # old_projects_lst = app.soap.get_projects_lst("administrator", "root")
+    # old_projects_lst = app.project.get_projects_lst()
+    old_projects_lst = app.soap.get_projects_lst("administrator", "root")
     project = random.choice(old_projects_lst)
     app.project.delete_project(project)
-    new_projects_list = app.project.get_projects_lst()
-    # new_projects_list = app.soap.get_projects_lst("administrator", "root")
+    # new_projects_list = app.project.get_projects_lst()
+    new_projects_list = app.soap.get_projects_lst("administrator", "root")
     old_projects_lst.remove(project)
     assert old_projects_lst == new_projects_list
     """
