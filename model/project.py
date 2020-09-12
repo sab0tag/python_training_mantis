@@ -10,12 +10,12 @@ class Project:
         self.viewstatus = viewstatus
         self.description = description
 
-
     def __repr__(self):
         return "%s:%s:%s:%s:%s" % (self.id, self.name, self.status, self.viewstatus, self.description)
 
     def __eq__(self, other):
-        return (self.id is None or other.id is None or self.id == other.id) and self.name == other.name and self.status == other.status \
+        return (
+                           self.id is None or other.id is None or self.id == other.id) and self.name == other.name and self.status == other.status \
                and self.viewstatus == other.viewstatus and self.description == other.description
 
     def id_or_max(self):

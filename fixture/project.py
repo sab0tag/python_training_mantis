@@ -57,18 +57,14 @@ class ProjectHelper:
         self.fill_project_form(project)
         driver.find_element_by_xpath("//input[@value='Add Project']").click()
 
-    def delete_project(self, id):
+    def delete_project(self, project):
         driver = self.app.driver
         self.open_project_page()
-        self.select_project_by_id(id)
+        driver.find_element_by_css_selector("a[href='manage_proj_edit_page.php?project_id=%s" % project.id).click()
         driver.find_element_by_xpath("//input[@type='submit' and @value='Delete Project']").click()
         if driver.current_url.endswith("/manage_proj_delete.php"):
             driver.find_element_by_xpath("//input[@type='submit' and @value='Delete Project']").click()
         self.back_to_the_main_page()
-
-    def select_project_by_id(self, id):
-        driver = self.app.driver
-        driver.find_element_by_css_selector("tr:nth-child(n+3) > td:nth-child(n) > a").click()
 
     def back_to_the_main_page(self):
         driver = self.app.driver
